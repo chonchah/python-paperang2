@@ -1,13 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*-coding:utf-8-*-
-__author__ = "ihciah"
 
+from enum import Enum
 
-class BtCommandByte(object):
+class BtCommandByte():
     @staticmethod
     def findCommand(c):
-        keys = filter(lambda x: not x.startswith("__") and BtCommandByte.__getattribute__(BtCommandByte, x) == c,
-                      dir(BtCommandByte))
+        keys = list(filter(lambda x: not x.startswith("__") and BtCommandByte.__getattribute__(BtCommandByte, x) == c,
+                      dir(BtCommandByte)))
         return keys[0] if keys else "NO_MATCH_COMMAND"
 
     __fmversion__ = "1.2.7"

@@ -1,18 +1,20 @@
-# 喵喵机蓝牙API By ihciah
+# Paperang(喵喵机) Python API
 
-### 依赖
+### Requirements & Dependencies
 
-`pybluez` 蓝牙API需要(树莓派上折腾这东西踩了挺多坑
+OS: Linux
 
-`twisted, pyopenssl` 微信接口脚本需要
+Python: 3.5-3.7 (tested)
 
+`pybluez` Needed by operating on the system bluetooth stack
+ 
 `cv2, numpy` 图像转换工具需要
 
 ### 建立连接
 
 `BtManager()` 参数留空会搜索附近可用的喵喵机并连接
 
-`BtManager("69:68:63:69:61:68")` 附加指定MAC会跳过搜索过程直接连接设备，更省时间
+`BtManager("AA:BB:CC:DD:EE:FF")` 附加指定MAC会跳过搜索过程直接连接设备，更省时间
 
 ### 打印图像
 
@@ -75,3 +77,8 @@ mmj.disconnect()
 顺便丢两个芯片型号: `NUC123LD4BN0`, `STM32F071CBU6`，似乎是Cortex-M0。
 
 PS: 本代码仅供非盈利用途，如用于商业用途请另请高明。
+
+### Acknowledgement 致谢
+Thanks for all the reverse engineering work done by the original author of this project.
+
+

@@ -1,18 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*-coding:utf-8-*-
-__author__ = "ihciah"
 
 import struct, zlib, logging
 from bluetooth import BluetoothSocket, find_service, RFCOMM, discover_devices
 from const import BtCommandByte
 
-
-class BtManager:
+class Paperang:
     standardKey = 0x35769521
     padding_line = 300
-    max_send_msg_length = 2016
+    max_send_msg_length = 1500
     max_recv_msg_length = 1024
-    uuid = "00001101-0000-1000-8000-00805F9B34FB"
+    service_uuid = "00001101-0000-1000-8000-00805F9B34FB"
 
     def __init__(self, address=None):
         self.address = address
@@ -44,7 +42,7 @@ class BtManager:
                         "It may take time, you'd better specify mac address to avoid a scan.")
         valid_names = ['MiaoMiaoJi', 'Paperang']
         nearby_devices = discover_devices(lookup_names=True)
-        valid_devices = filter(lambda d: len(d) == 2 and d[1] in valid_names, nearby_devices)
+        valid_devices = list(filter(lambda d: len(d) == 2 and d[1] in valid_names, nearby_devices))
         if len(valid_devices) == 0:
             logging.error("Cannot find device with name %s." % " or ".join(valid_names))
             return False
@@ -60,15 +58,15 @@ class BtManager:
 
     def scanservices(self):
         logging.info("Searching for services...")
-        service_matches = find_service(uuid=self.uuid, address=self.address)
-        valid_service = filter(
+        service_matches = find_service(uuid=self.service_uuid, address=self.address)
+        valid_service = list(filter(
             lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
             service_matches
-        )
+        ))
         if len(valid_service) == 0:
             logging.error("Cannot find valid services on device with MAC %s." % self.address)
             return False
-        logging.info("Found a valid service on target device.")
+        logging.info("Found a valid service")
         self.service = valid_service[0]
         return True
 
@@ -94,8 +92,8 @@ class BtManager:
         result = [bytes[i:i+length] for i in range(0, len(bytes), length)]
         return result
 
-    def sendToBt(self, allbytes, control_command, need_reply=True):
-        bytes_list = self.addBytesToList(allbytes)
+    def sendToBt(self, data_bytes, control_command, need_reply=True):
+        bytes_list = self.addBytesToList(data_bytes)
         for i, bytes in enumerate(bytes_list):
             tmp = self.packPerBytes(bytes, control_command, i)
             self.sendMsgAllPackage(tmp)
@@ -189,35 +187,3 @@ class BtManager:
         msg = struct.pack('<B', 1)
         self.sendToBt(msg, BtCommandByte.PRT_GET_HW_INFO)
 
-if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.INFO)
-
-    # If you know the MAC address of your device, use this parameter to avoid a scan, which is time-consuming
-    # mmj = BtManager("69:68:63:69:61:68")
-
-    # Start a scan to find valid devices
-    mmj = BtManager()
-
-    if mmj.connected:
-        mmj.sendDensityToBt(95)
-
-        # If you want it never powered-off
-        # mmj.sendPowerOffTimeToBt(0)
-        # mmj.queryPowerOffTime()
-
-        # Print an existing image(need opencv):
-        # from image_process import ImageConverter
-        # img = ImageConverter.image2bmp(r"C:\Users\Lemon\Desktop\0.jpg")
-        # mmj.sendImageToBt(img)
-
-        # Print a pure black image with 300 lines
-        # img = "\xff" * 48 * 300
-        # mmj.sendImageToBt(img)
-
-        # Print 2 line of text(need opencv)
-        from image_process import TextConverter
-        img = TextConverter.text2bmp("Coded By") + TextConverter.text2bmp(__author__)
-        mmj.sendImageToBt(img)
-        mmj.disconnect()
-    else:
-        logging.error("Oops! Cannot establish connection with Paperang devices.")

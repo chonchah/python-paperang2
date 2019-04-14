@@ -4,11 +4,13 @@
 import struct, zlib, logging
 from bluetooth import BluetoothSocket, find_service, RFCOMM, discover_devices
 from const import BtCommandByte
+import codecs
+
 
 class Paperang:
     standardKey = 0x35769521
     padding_line = 300
-    max_send_msg_length = 1500
+    max_send_msg_length = 2016
     max_recv_msg_length = 1024
     service_uuid = "00001101-0000-1000-8000-00805F9B34FB"
 
@@ -76,20 +78,19 @@ class Paperang:
         logging.info("Sending msg with length = %d..." % sent_len)
 
     def crc32(self, content):
-        return zlib.crc32(content, self.crcKey if self.crckeyset else self.standardKey)
+        return zlib.crc32(content, self.crcKey if self.crckeyset else self.standardKey) & 0xffffffff
 
     def packPerBytes(self, bytes, control_command, i):
         result = struct.pack('<BBB', 2, control_command, i)
         result += struct.pack('<H', len(bytes))
         result += bytes
-        result += struct.pack('<i', self.crc32(bytes))
+        result += struct.pack('<I', self.crc32(bytes))
         result += struct.pack('<B', 3)
         return result
 
-
     def addBytesToList(self, bytes):
         length = self.max_send_msg_length
-        result = [bytes[i:i+length] for i in range(0, len(bytes), length)]
+        result = [bytes[i:i + length] for i in range(0, len(bytes), length)]
         return result
 
     def sendToBt(self, data_bytes, control_command, need_reply=True):
@@ -104,7 +105,7 @@ class Paperang:
         # Here we assume that there is only one received packet.
         raw_msg = self.sock.recv(self.max_recv_msg_length)
         parsed = self.resultParser(raw_msg)
-        logging.info("Recv: " + raw_msg.encode('hex'))
+        logging.info("Recv: " + codecs.encode(raw_msg, "hex_codec").decode())
         logging.info("Received %d packets: " % len(parsed) + "".join([str(p) for p in parsed]))
         return raw_msg, parsed
 
@@ -116,10 +117,11 @@ class Paperang:
                 def __str__(self):
                     return "\nControl command: %s(%s)\nPayload length: %d\nPayload(hex): %s" % (
                         self.command, BtCommandByte.findCommand(self.command)
-                        , self.payload_length, self.payload.encode('hex')
+                        , self.payload_length, codecs.encode(self.payload, "hex_codec")
                     )
+
             info = Info()
-            _, info.command, _, info.payload_length = struct.unpack('<BBBH', data[base:base+5])
+            _, info.command, _, info.payload_length = struct.unpack('<BBBH', data[base:base + 5])
             info.payload = data[base + 5: base + 5 + info.payload_length]
             info.crc32 = data[base + 5 + info.payload_length: base + 9 + info.payload_length]
             base += 10 + info.payload_length
@@ -147,7 +149,8 @@ class Paperang:
 
     def sendImageToBt(self, binary_img):
         self.sendPaperTypeToBt()
-        msg = struct.pack("<%dc" % len(binary_img), *binary_img)
+        # msg = struct.pack("<%dc" % len(binary_img), *map(bytes, binary_img))
+        msg = b"".join(map(lambda x: struct.pack("<c",x.to_bytes(1,byteorder="little")),binary_img))
         self.sendToBt(msg, BtCommandByte.PRT_PRINT_DATA, need_reply=False)
         self.sendFeedLineToBt(self.padding_line)
 
@@ -186,4 +189,3 @@ class Paperang:
     def queryHardwareInfo(self):
         msg = struct.pack('<B', 1)
         self.sendToBt(msg, BtCommandByte.PRT_GET_HW_INFO)
-

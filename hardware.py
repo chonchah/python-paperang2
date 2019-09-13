@@ -10,7 +10,8 @@ import codecs
 class Paperang:
     standardKey = 0x35769521
     padding_line = 300
-    max_send_msg_length = 2016
+    max_send_msg_length = 1536
+    # max_send_msg_length = 2016
     max_recv_msg_length = 1024
     service_uuid = "00001101-0000-1000-8000-00805F9B34FB"
 
@@ -26,7 +27,7 @@ class Paperang:
             return False
         logging.info("Service found. Connecting to \"%s\" on %s..." % (self.service["name"], self.service["host"]))
         self.sock = BluetoothSocket(RFCOMM)
-        self.sock.connect((self.service["host"], self.service["port"]))
+        self.sock.connect((self.service["host"].decode('UTF-8'), self.service["port"]))
         self.sock.settimeout(60)
         logging.info("Connected.")
         self.registerCrcKeyToBt()
@@ -61,10 +62,16 @@ class Paperang:
     def scanservices(self):
         logging.info("Searching for services...")
         service_matches = find_service(uuid=self.service_uuid, address=self.address)
+        service_matches = find_service(address=self.address)
+        print(service_matches)
         valid_service = list(filter(
-            lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
+            lambda s: 'protocol' in s and 'name' in s and s['name'] == 'SerialPort',
             service_matches
         ))
+        # valid_service = list(filter(
+        #     lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
+        #     service_matches
+        # ))
         if len(valid_service) == 0:
             logging.error("Cannot find valid services on device with MAC %s." % self.address)
             return False
@@ -151,6 +158,7 @@ class Paperang:
         self.sendPaperTypeToBt()
         # msg = struct.pack("<%dc" % len(binary_img), *map(bytes, binary_img))
         msg = b"".join(map(lambda x: struct.pack("<c",x.to_bytes(1,byteorder="little")),binary_img))
+        print(msg)
         self.sendToBt(msg, BtCommandByte.PRT_PRINT_DATA, need_reply=False)
         self.sendFeedLineToBt(self.padding_line)
 

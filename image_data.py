@@ -39,6 +39,7 @@ def im2binimage(im, conversion="threshold"):
         raise ValueError("Unsupported conversion method")
     return ret
 
+# this is straight from https://github.com/tgray/hyperdither
 @numba.jit
 def dither(num, thresh = 127):
     derr = np.zeros(num.shape, dtype=int)

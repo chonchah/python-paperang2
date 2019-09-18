@@ -110,10 +110,11 @@ def im2binimage2(im):
     # blackandwhite_img = enhanced_img.convert('1')
     # blackandwhite_img.show()
     np_img = np.array(enhanced_img).astype(int)
-    # there must be a less stupid way to invert the array but i am baby
+    # flipping the ones and zeros
     np_img[np_img == 1] = 100
     np_img[np_img == 0] = 1
     np_img[np_img == 100] = 0
+
     return binimage2bitstream(np_img)
 
 def sirius(im):

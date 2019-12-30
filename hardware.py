@@ -54,29 +54,32 @@ class Paperang:
             logging.warning("\n".join(valid_devices))
         else:
             logging.warning(
-                "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0], valid_devices[0][1])
+                "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0].decode('UTF-8'), valid_devices[0][1])
             )
-        self.address = valid_devices[0][0]
+        self.address = valid_devices[0][0].decode('UTF-8')
         return True
 
     def scanservices(self):
         logging.info("Searching for services...")
-        service_matches = find_service(uuid=self.service_uuid, address=self.address)
+        # service_matches = find_service(uuid=self.service_uuid, address=self.address)
         service_matches = find_service(address=self.address)
+        print("printing service matches...")
         print(service_matches)
-        valid_service = list(filter(
-            lambda s: 'protocol' in s and 'name' in s and s['name'] == 'SerialPort',
-            service_matches
-        ))
+        print("...done.")
         # valid_service = list(filter(
-        #     lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
+        #     lambda s: 'protocol' in s and 'name' in s and s['name'] == 'SerialPort',
         #     service_matches
         # ))
-        if len(valid_service) == 0:
-            logging.error("Cannot find valid services on device with MAC %s." % self.address)
-            return False
-        logging.info("Found a valid service")
-        self.service = valid_service[0]
+        # # valid_service = list(filter(
+        # #     lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
+        # #     service_matches
+        # # ))
+        # if len(valid_service) == 0:
+        #     logging.error("Cannot find valid services on device with MAC %s." % self.address)
+        #     return False
+        # logging.info("Found a valid service")
+        # self.service = valid_service[0]
+        self.service = service_matches[0]
         return True
 
     def sendMsgAllPackage(self, msg):

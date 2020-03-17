@@ -27,7 +27,7 @@ class Paperang:
             return False
         logging.info("Service found. Connecting to \"%s\" on %s..." % (self.service["name"], self.service["host"]))
         self.sock = BluetoothSocket(RFCOMM)
-        self.sock.connect((self.service["host"].decode('UTF-8'), self.service["port"]))
+        self.sock.connect((self.service["host"], self.service["port"]))
         self.sock.settimeout(60)
         logging.info("Connected.")
         self.registerCrcKeyToBt()
@@ -65,13 +65,10 @@ class Paperang:
         service_matches = find_service(address=self.address)
         print(service_matches)
         valid_service = list(filter(
-            lambda s: 'protocol' in s and 'name' in s and s['name'] == 'SerialPort',
+            lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
             service_matches
         ))
-        # valid_service = list(filter(
-        #     lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
-        #     service_matches
-        # ))
+        print(valid_service[0])
         if len(valid_service) == 0:
             logging.error("Cannot find valid services on device with MAC %s." % self.address)
             return False

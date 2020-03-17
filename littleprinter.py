@@ -13,7 +13,7 @@ class Paperang_Printer:
 
 if __name__ == '__main__':
     mmj=Paperang_Printer()
-    for changes in watch('/Users/ktamas/tmp'):
+    for changes in watch('/root/tmp'):
         file = changes.pop()[1] 
         print("Printing " + file)
         mmj.print_sirius_image(file)

@@ -1,4 +1,7 @@
-pybluez
+watchgod
+numba
 numpy
+pilkit
+pybluez
 scikit-image
-
+scipy

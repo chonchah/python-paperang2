@@ -4,10 +4,10 @@
 import numpy as np
 import skimage.color, skimage.transform, skimage.filters, skimage.feature
 import skimage as ski
-import instakit.processors.ext.halftone, instakit.utils.mode, instakit.utils.ndarrays
 import pilkit.processors
 from PIL import Image, ImageFilter, ImageOps, ImageEnhance
 import numba
+
 
 def _pack_block(bits_str: str) -> bytearray:
     # bits_str are human way (MSB:LSB) of representing binary numbers (e.g. "1010" means 12)

@@ -1,10 +1,10 @@
-pybluez
 numpy
+pybluez
 scikit-image
+scipy
 
-# needed for little printer script
+# needed for littleprinter.py 
 instakit
-pilkit
 numba
+pilkit
 watchgod
-

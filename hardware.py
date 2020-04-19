@@ -4,6 +4,7 @@
 import struct, zlib, logging
 from bluetooth import BluetoothSocket, find_service, RFCOMM, discover_devices
 from const import BtCommandByte
+from platform import system #so we can tell which OS we're using
 import codecs
 
 
@@ -11,7 +12,6 @@ class Paperang:
     standardKey = 0x35769521
     padding_line = 300
     max_send_msg_length = 1536
-    # max_send_msg_length = 2016
     max_recv_msg_length = 1024
     service_uuid = "00001101-0000-1000-8000-00805F9B34FB"
 
@@ -61,26 +61,39 @@ class Paperang:
 
     def scanservices(self):
         logging.info("Searching for services...")
-        # service_matches = find_service(uuid=self.service_uuid, address=self.address)
+        if system() == "Darwin":
+            return self.scanservices_osx()
+
+        logging.info("Searching for services...")
+        service_matches = find_service(uuid=self.service_uuid, address=self.address)
         service_matches = find_service(address=self.address)
-        print("printing service matches...")
         print(service_matches)
-        print("...done.")
-        # valid_service = list(filter(
-        #     lambda s: 'protocol' in s and 'name' in s and s['name'] == 'SerialPort',
-        #     service_matches
-        # ))
-        # # valid_service = list(filter(
-        # #     lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
-        # #     service_matches
-        # # ))
-        # if len(valid_service) == 0:
-        #     logging.error("Cannot find valid services on device with MAC %s." % self.address)
-        #     return False
-        # logging.info("Found a valid service")
-        # self.service = valid_service[0]
-        self.service = service_matches[0]
+        valid_service = list(filter(
+            lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
+            service_matches
+        ))
+        print(valid_service[0])
+        if len(valid_service) == 0:
+            logging.error("Cannot find valid services on device with MAC %s." % self.address)
+            return False
+        logging.info("Found a valid service")
+        self.service = valid_service[0]
         return True
+
+
+    def scanservices_osx(self):
+        # Example find_service() output on OSX 10.15.2:
+        # [{'host': b'A1:B2:C3:D4:E5:F6', 'port': 1, 'name': 'Port', 'description': None,
+        #  'provider': None, 'protocol': None, 'service-classes': [], 'profiles': [], 'service-id': None}]
+        service_matches = find_service(address=self.address)
+        # print("printing service matches...")
+        # print(service_matches)
+        # print("...done.")
+        if len(service_matches) == 0:
+            logging.error("Cannot find valid services on device with MAC %s." % self.address)
+            return False
+        self.service = service_matches[0]
+        return True        
 
     def sendMsgAllPackage(self, msg):
         # Write data directly to device

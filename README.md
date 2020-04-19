@@ -2,9 +2,12 @@
 
 ### Requirements & Dependencies
 
-OS: Linux, Macos 10.15.2 (tested)
-
+OS: OSX (tested on Catalina)/Linux (tested Debian Buster on a Raspberry Pi 4)  
 Python: 3.5-3.7 (tested)
+
+Required debian packages: `libbluetooth-dev libhidapi-dev libatlas-base-dev python3-llvmlite python3-numba python-llvmlite llvm-dev`
+
+Python Modules: install with `pip3 install -r requirements.txt`
 
 ### macOS instructions
 
@@ -104,5 +107,4 @@ PS: 本代码仅供非盈利用途，如用于商业用途请另请高明。
 
 ### Acknowledgement 致谢
 Thanks for all the reverse engineering work done by the original author of this project.
-
 

@@ -1,13 +1,19 @@
+import config
 import time
 import hardware
 import image_data
 
 class Paperangg_Printer:
     def __init__(self):
-        self.printer_hardware = hardware.Paperang()
+        if hasattr(config, "macaddress"):
+            print("attempting test print to MAC address \"% s\""% config.macaddress)
+            self.printer_hardware = hardware.Paperang(config.macaddress)
+        else:
+            print("searching for printer for test print...")
+            self.printer_hardware = hardware.Paperang()
 
         # having trouble connecting? uncomment the following line and input
-        # your paperang's MAC address to connect directly
+        # your paperang's MAC address directly
         # self.printer_hardware = hardware.Paperang("AA:BB:CC:DD:EE:FF")
 
     def print_self_test(self):

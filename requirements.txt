@@ -2,3 +2,9 @@ pybluez
 numpy
 scikit-image
 
+# needed for little printer script
+instakit
+pilkit
+numba
+watchgod
+

@@ -1,73 +1,47 @@
-# Paperang(喵喵机) Python API
+# Paperang(喵喵机) Python API, now with Little Printer integration!
 
 ### Requirements & Dependencies
 
-OS: Linux
+OS: Linux, Macos 10.15.2 (tested)
 
 Python: 3.5-3.7 (tested)
 
-Python Modules; install with `pip3 install [modulename]`
-1. `pybluez` Needed by operating on the system bluetooth stack
-2. `numpy`
-3. `scikit-image`
-4. `Cython`
-5. `instakit`
-`pilkit`
-`numba`
-`watchgod` (to watch little printer queue)
+### macOS instructions
+
+#### Set up and test your printer
+You'll need python3 installed; check if you have it by typing `which python3` in Terminal or your favorite console application.
+
+1. Install necessary python modules:
+```sh
+pip3 install -r requirements.txt
+```
+2. Ensure bluetooth is enabled on your computer. You do *not* need to connect your Paperang to your computer yet! We'll do that later, via the command line.
+3. Turn on your Paperang and set it near your computer
+4. Run the test script, which will tell your Paperang to print a self-test if it's successful:
+```sh
+python3 testprint.py
+```
+If you've never paired your Paperang with your computer, you might get a dialog asking you to allow the Paperang to pair with your system. Click `connect`. You should only have to do this once.
+
+5. If the test print was successful, the script will print out your device's MAC address on the console, as well as on the printer. You can enter that into the script to connect to your Paperang directly, avoiding the wait time for scanning for printers.
+
+If you need to look up your Paperang's MAC address quickly, you can use the `system_profiler` command to output information on all paired bluetooth devices:
+```sh
+system_profiler SPBluetoothDataType
+```
+
+#### Print Little Printer data
 
 
-### macOS instructions/usage
 
-On the command line, in terminal or your favorite console app:
-1. ensure you have python3 installed via `which python3`
-
-
-Connect your paperang to your mac:
-1. Settings > Bluetooth
-2. Make sure bluetooth is on
-3. Find device named "paperang" and click "connect"
-   you'll get a dialog that tells you that you must configure the paperang in printer settings. the problem is that it doesn't show up in the printer list. 
-   Your paperang might disconnect from bluetooth at this point. That's okay!
-   Hit cancel.
-4. run `system_profiler SPBluetoothDataType` on the command line and look for a block like this:
-   ```          Paperang:
-              Address: FC-58-FA-19-04-68
-              Major Type: Miscellaneous
-              Minor Type: Unknown
-              Services: Port
-              Paired: Yes
-              Configured: Yes
-              Connected: No
-              Firmware Version: 0x0000
-              Class of Device: 0x00 0x00 0x0000
-              EDR Supported: No
-              eSCO Supported: No
-              SSP Supported: Yes
-    ```
-    The value after `Address:` is what you want. Copy that text!
-5. add printer. choose "IP" type. paste in the text from the previous step into the "address" field. Set "printer type" to "Generic PostScript Printer." (IDK if this matters.) You should be connected!
-
-
-Printer's not staying connected.
-Things I've tried that haven't worked so far:
-- running the script as quickly as I can right after bluetooth connect
-- running a screen job with `screen /dev/tty.PaperangPort 9600` (c.f. https://superuser.com/questions/715703/is-there-anyway-to-use-bluetooth-serial-port-profile-spp-devices-on-mac-os-x-m)
-- installing blueutil and using that to connect, then running the script. (c.f. https://trevorsullivan.net/2019/07/30/control-bluetooth-on-apple-macbook-pro-from-the-command-line/)
-    - error: "ERROR:root:Cannot find valid services on device with MAC FC-58-FA-19-04-68."
-
-
-### 建立连接 
 ### Establishing a connection
 
 `BtManager()` Leave the parameters blank to search for nearby paperang devices
 
 `BtManager("AA:BB:CC:DD:EE:FF")` Calling with a specific MAC address skips searching for devices, saving time
 
-### 打印图像
 ### Printing images
 
-从API看该机器只能输入二值图像进行打印，所以文本转图片是在客户端完成的。
 The printer's API only accepts binary images for printing, so we need to convert text to images on the client side.
 
 The format of the printed image is binary data, each bit represents black (1) or white (0), and 384 dots per line.

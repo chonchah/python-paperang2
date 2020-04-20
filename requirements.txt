@@ -1,7 +1,10 @@
-watchgod
-numba
 numpy
-pilkit
 pybluez
 scikit-image
 scipy
+
+# needed for littleprinter.py 
+instakit
+numba
+pilkit
+watchgod

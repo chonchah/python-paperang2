@@ -4,6 +4,7 @@
 import struct, zlib, logging
 from bluetooth import BluetoothSocket, find_service, RFCOMM, discover_devices
 from const import BtCommandByte
+from platform import system #so we can tell which OS we're using
 import codecs
 
 
@@ -26,7 +27,10 @@ class Paperang:
             return False
         logging.info("Service found. Connecting to \"%s\" on %s..." % (self.service["name"], self.service["host"]))
         self.sock = BluetoothSocket(RFCOMM)
-        self.sock.connect((self.service["host"], self.service["port"]))
+        if system() == "Darwin":
+            self.sock.connect((self.service["host"].decode('UTF-8'), self.service["port"]))
+        else:
+            self.sock.connect((self.service["host"], self.service["port"]))
         self.sock.settimeout(60)
         logging.info("Connected.")
         self.registerCrcKeyToBt()
@@ -41,7 +45,7 @@ class Paperang:
 
     def scandevices(self):
         logging.warning("Searching for devices...\n"
-                        "It may take time, you'd better specify mac address to avoid a scan.")
+                        "This will take some time; consider specifing a mac address to avoid a scan.")
         valid_names = ['MiaoMiaoJi', 'Paperang']
         nearby_devices = discover_devices(lookup_names=True)
         valid_devices = list(filter(lambda d: len(d) == 2 and d[1] in valid_names, nearby_devices))
@@ -52,13 +56,23 @@ class Paperang:
             logging.warning("Found multiple valid machines, the first one will be used.\n")
             logging.warning("\n".join(valid_devices))
         else:
-            logging.warning(
-                "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0], valid_devices[0][1])
-            )
-        self.address = valid_devices[0][0]
+            if system() == "Darwin":
+                logging.warning(
+                    "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0].decode('UTF-8'), valid_devices[0][1])
+                )
+                self.address = valid_devices[0][0].decode('UTF-8')
+            else:
+                logging.warning(
+                    "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0], valid_devices[0][1])
+                )
+                self.address = valid_devices[0][0]
         return True
 
     def scanservices(self):
+        logging.info("Searching for services...")
+        if system() == "Darwin":
+            return self.scanservices_osx()
+
         logging.info("Searching for services...")
         service_matches = find_service(uuid=self.service_uuid, address=self.address)
         service_matches = find_service(address=self.address)
@@ -74,6 +88,21 @@ class Paperang:
         logging.info("Found a valid service")
         self.service = valid_service[0]
         return True
+
+
+    def scanservices_osx(self):
+        # Example find_service() output on OSX 10.15.2:
+        # [{'host': b'A1:B2:C3:D4:E5:F6', 'port': 1, 'name': 'Port', 'description': None,
+        #  'provider': None, 'protocol': None, 'service-classes': [], 'profiles': [], 'service-id': None}]
+        service_matches = find_service(address=self.address)
+        # print("printing service matches...")
+        # print(service_matches)
+        # print("...done.")
+        if len(service_matches) == 0:
+            logging.error("Cannot find valid services on device with MAC %s." % self.address)
+            return False
+        self.service = service_matches[0]
+        return True        
 
     def sendMsgAllPackage(self, msg):
         # Write data directly to device

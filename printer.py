@@ -6,12 +6,13 @@ import config
 
 class Paperang_Printer:
     def __init__(self):
-        if config.macaddress:
+        if hasattr(config, "macaddress"):
             self.printer_hardware = hardware.Paperang(config.macaddress)
         else:
             self.printer_hardware = hardware.Paperang()
 
     def print_self_test(self):
+        print("attempting test print to MAC address \"% s\""% config.macaddress)
         if self.printer_hardware.connected:
             self.printer_hardware.sendSelfTestToBt()
 

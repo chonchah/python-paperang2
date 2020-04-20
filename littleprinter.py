@@ -6,7 +6,10 @@ import config
 
 class Paperang_Printer:
     def __init__(self):
-        self.printer_hardware = hardware.Paperang('00:15:83:C2:67:20')
+        if hasattr(config, "macaddress"):
+            self.printer_hardware = hardware.Paperang(config.macaddress)
+        else:
+            self.printer_hardware = hardware.Paperang()
     
     def print_sirius_image(self, path):
         if self.printer_hardware.connected:

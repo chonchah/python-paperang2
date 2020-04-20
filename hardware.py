@@ -27,7 +27,10 @@ class Paperang:
             return False
         logging.info("Service found. Connecting to \"%s\" on %s..." % (self.service["name"], self.service["host"]))
         self.sock = BluetoothSocket(RFCOMM)
-        self.sock.connect((self.service["host"].decode('UTF-8'), self.service["port"]))
+        if system() == "Darwin":
+            self.sock.connect((self.service["host"].decode('UTF-8'), self.service["port"]))
+        else:
+            self.sock.connect((self.service["host"], self.service["port"]))
         self.sock.settimeout(60)
         logging.info("Connected.")
         self.registerCrcKeyToBt()
@@ -53,10 +56,16 @@ class Paperang:
             logging.warning("Found multiple valid machines, the first one will be used.\n")
             logging.warning("\n".join(valid_devices))
         else:
-            logging.warning(
-                "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0].decode('UTF-8'), valid_devices[0][1])
-            )
-        self.address = valid_devices[0][0].decode('UTF-8')
+            if system() == "Darwin":
+                logging.warning(
+                    "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0].decode('UTF-8'), valid_devices[0][1])
+                )
+                self.address = valid_devices[0][0].decode('UTF-8')
+            else:
+                logging.warning(
+                    "Found a valid machine with MAC %s and name %s" % (valid_devices[0][0], valid_devices[0][1])
+                )
+                self.address = valid_devices[0][0]
         return True
 
     def scanservices(self):

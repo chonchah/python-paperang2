@@ -119,8 +119,7 @@ def im2binimage2(im):
     return binimage2bitstream(np_img)
 
 def sirius(im):
-    img = Image.open(im)
-    np_img = np.array(img).astype(int)
+    np_img = np.fromfile(im, dtype='uint8')
     # there must be a less stupid way to invert the array but i am baby
     np_img[np_img == 1] = 100
     np_img[np_img == 0] = 1

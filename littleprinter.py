@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
 import time
 import hardware
 import image_data
+import tempfile
+import os
 from watchgod import watch
 import config
+from pathlib import Path
 
 class Paperang_Printer:
     def __init__(self):
@@ -17,7 +21,11 @@ class Paperang_Printer:
 
 if __name__ == '__main__':
     mmj=Paperang_Printer()
-    for changes in watch(config.tmpdir):
+    # `sirius-client` will write to this folder
+    tmpdir = os.path.join(tempfile.gettempdir(), 'sirius-client')
+    Path(tmpdir).mkdir(parents=True, exist_ok=True)
+    
+    for changes in watch(tmpdir):
         file = changes.pop()[1] 
         print("Printing " + file)
         mmj.print_sirius_image(file)

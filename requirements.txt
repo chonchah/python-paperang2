@@ -1,11 +1,8 @@
+cython
 numpy
 pybluez
 scikit-image
 scipy
-cython
-
-# needed for littleprinter.py
-instakit
 numba
 pilkit
 watchgod

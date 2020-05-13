@@ -100,9 +100,6 @@ def im2binimage2(im):
     # out = Image.fromarray(m2[::-1,:]).convert('1')
     out = Image.fromarray(m2[::-1,:])
     out.show()
-    # ditherer = instakit.processors.ext.halftone.Atkinson()
-    # dithered_img = ditherer.process(img)
-    # dithered_img.show()
     # the ditherer is stupid and does not make black and white images, just... almost so this fixes that
     enhancer = ImageEnhance.Contrast(out)
     enhanced_img = enhancer.enhance(4.0)

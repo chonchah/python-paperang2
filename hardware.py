@@ -46,7 +46,7 @@ class Paperang:
     def scandevices(self):
         logging.warning("Searching for devices...\n"
                         "This will take some time; consider specifing a mac address to avoid a scan.")
-        valid_names = ['MiaoMiaoJi', 'Paperang']
+        valid_names = ['MiaoMiaoJi', 'Paperang', 'Paperang_P2S']
         nearby_devices = discover_devices(lookup_names=True)
         valid_devices = list(filter(lambda d: len(d) == 2 and d[1] in valid_names, nearby_devices))
         if len(valid_devices) == 0:
@@ -98,10 +98,14 @@ class Paperang:
         # print("printing service matches...")
         # print(service_matches)
         # print("...done.")
-        if len(service_matches) == 0:
+        valid_services = list(filter(
+            lambda s: 'name' in s and s['name'] == 'SerialPort',
+            service_matches
+        ))
+        if len(valid_services) == 0:
             logging.error("Cannot find valid services on device with MAC %s." % self.address)
             return False
-        self.service = service_matches[0]
+        self.service = valid_services[0]
         return True        
 
     def sendMsgAllPackage(self, msg):
@@ -183,7 +187,7 @@ class Paperang:
         self.sendPaperTypeToBt()
         # msg = struct.pack("<%dc" % len(binary_img), *map(bytes, binary_img))
         msg = b"".join(map(lambda x: struct.pack("<c",x.to_bytes(1,byteorder="little")),binary_img))
-        print(msg)
+        # print(msg)
         self.sendToBt(msg, BtCommandByte.PRT_PRINT_DATA, need_reply=False)
         self.sendFeedLineToBt(self.padding_line)
 

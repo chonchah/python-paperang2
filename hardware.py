@@ -73,12 +73,13 @@ class Paperang:
         if system() == "Darwin":
             return self.scanservices_osx()
 
-        logging.info("Searching for services...")
+        # Example find_service() output on raspbian buster:
+        # {'service-classes': ['1101'], 'profiles': [], 'name': 'Port', 'description': None,
+        #  'provider': None, 'service-id': None, 'protocol': 'RFCOMM', 'port': 1, 
+        #  'host': 'A1:B2:C3:D4:E5:F6'}
         service_matches = find_service(uuid=self.service_uuid, address=self.address)
-        service_matches = find_service(address=self.address)
-        print(service_matches)
         valid_service = list(filter(
-            lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and s['name'] == 'SerialPort',
+            lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and (s['name'] == 'SerialPort' or s['name'] == 'Port'),
             service_matches
         ))
         print(valid_service[0])
@@ -88,7 +89,6 @@ class Paperang:
         logging.info("Found a valid service")
         self.service = valid_service[0]
         return True
-
 
     def scanservices_osx(self):
         # Example find_service() output on OSX 10.15.2:

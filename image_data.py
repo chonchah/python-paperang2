@@ -7,6 +7,7 @@ import skimage as ski
 import pilkit.processors
 from PIL import Image, ImageFilter, ImageOps, ImageEnhance
 import numba
+import config
 
 
 def _pack_block(bits_str: str) -> bytearray:
@@ -28,6 +29,8 @@ def binimage2bitstream(bin_image: np.ndarray):
 def im2binimage(im, conversion="threshold"):
     # convert standard numpy array image to bin_image
     fixed_width = 384
+    if hasattr(config, "width"):
+        fixed_width = config.width
     if (len(im.shape) != 2):
         im = ski.color.rgb2gray(im)
     im = ski.transform.resize(im, (round( fixed_width /im.shape[1]  * im.shape[0]), fixed_width))

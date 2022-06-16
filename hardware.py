@@ -79,7 +79,7 @@ class Paperang:
         #  'host': 'A1:B2:C3:D4:E5:F6'}
         service_matches = find_service(uuid=self.service_uuid, address=self.address)
         valid_service = list(filter(
-            lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and (s['name'] == 'SerialPort' or s['name'] == 'Port'),
+            lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and (s['name'] == 'SerialPort' or s['name'] == 'Port'  or s['name'] == b'Port\x00'),
             service_matches
         ))
         print(valid_service[0])

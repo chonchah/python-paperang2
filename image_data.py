@@ -31,6 +31,8 @@ def im2binimage(im, conversion="threshold"):
     fixed_width = 384
     if hasattr(config, "width"):
         fixed_width = config.width
+    if (len(im.shape) > 3):
+        im = ski.color.rgba2rgb(im)
     if (len(im.shape) != 2):
         im = ski.color.rgb2gray(im)
     im = ski.transform.resize(im, (round( fixed_width /im.shape[1]  * im.shape[0]), fixed_width))
@@ -118,10 +120,7 @@ def im2binimage2(im):
 
     return binimage2bitstream(np_img)
 
-def sirius(im):
-    np_img = np.fromfile(im, dtype='uint8')
-    # there must be a less stupid way to invert the array but i am baby
-    np_img[np_img == 1] = 100
-    np_img[np_img == 0] = 1
-    np_img[np_img == 100] = 0
+def sirius(path):
+    np_img = ski.io.imread(path)
+    np_img = im2binimage(np_img)
     return binimage2bitstream(np_img)

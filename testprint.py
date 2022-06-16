@@ -31,3 +31,4 @@ class Paperangg_Printer:
 if __name__ == '__main__':
     mmj=Paperangg_Printer()
     mmj.print_self_test()
+    #mmj.print_sirius_image("C:\\Users\\chonc\\OneDrive\\Documentos\\Dibujos\\text75.jpg")

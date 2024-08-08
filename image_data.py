@@ -120,7 +120,7 @@ def im2binimage2(im):
 
     return binimage2bitstream(np_img)
 
-def sirius(path):
+def load_and_convert_image(path):
     np_img = ski.io.imread(path)
-    np_img = im2binimage(np_img)
-    return binimage2bitstream(np_img)
+    bw_image = im2binimage(np_img)
+    return binimage2bitstream(bw_image)

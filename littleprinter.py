@@ -15,9 +15,9 @@ class Paperang_Printer:
         else:
             self.printer_hardware = hardware.Paperang()
     
-    def print_sirius_image(self, path):
+    def print_image(self, path):
         if self.printer_hardware.connected:
-            self.printer_hardware.sendImageToBt(image_data.sirius(path))
+            self.printer_hardware.sendImageToBt(image_data.load_and_convert_image(path))
 
 if __name__ == '__main__':
     mmj=Paperang_Printer()
@@ -28,4 +28,4 @@ if __name__ == '__main__':
     for changes in watch(tmpdir):
         file = changes.pop()[1] 
         print("Printing " + file)
-        mmj.print_sirius_image(file)
+        mmj.print_image(file)

@@ -82,7 +82,7 @@ class Paperang:
             lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and (s['name'] == 'SerialPort' or s['name'] == 'Port'  or s['name'] == b'Port\x00'),
             service_matches
         ))
-        print(valid_service[0])
+        print(valid_service)
         if len(valid_service) == 0:
             logging.error("Cannot find valid services on device with MAC %s." % self.address)
             return False

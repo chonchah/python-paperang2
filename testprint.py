@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import config
-import time
 import hardware
 import image_data
 
@@ -24,11 +23,11 @@ class Paperangg_Printer:
         else:
             print("printer not connected.")
 
-    def print_sirius_image(self, path):
+    def print_image(self, path):
         if self.printer_hardware.connected:
-            self.printer_hardware.sendImageToBt(image_data.sirius(path))
+            self.printer_hardware.sendImageToBt(image_data.load_and_convert_image(path))
 
 if __name__ == '__main__':
     mmj=Paperangg_Printer()
     mmj.print_self_test()
-    #mmj.print_sirius_image("C:\\Users\\chonc\\OneDrive\\Documentos\\Dibujos\\text75.jpg")
+    #mmj.print_image("C:\\Users\\chonc\\OneDrive\\Documentos\\Dibujos\\text75.jpg")

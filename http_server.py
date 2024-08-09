@@ -4,7 +4,6 @@ import hardware
 import image_data
 import asyncio
 import tornado
-import tempfile
 import os
 # import thread libs
 from threading import Thread
@@ -67,9 +66,14 @@ ImageStack = ImageStackThread()
 
 
 def make_app():
-    return tornado.web.Application([
-        (r"/", PaperangPrinterHandler),
-    ])
+    # TODO: add static files handler in public directory
+    handlers = [
+        (r"/api/print", PaperangPrinterHandler),
+    ]
+    static_path = os.path.join(os.path.dirname(__file__), "public")
+    print("Serving static files from %s" % static_path)
+    handlers.append((r"/(.*)", tornado.web.StaticFileHandler, {"path": static_path, "default_filename": "index.html"}))
+    return tornado.web.Application(handlers)
 
 async def main():
     app = make_app()

@@ -83,4 +83,8 @@ async def main():
     await asyncio.Event().wait()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        ImageStack.stop()
+        ImageStack.printer_hardware.disconnect()

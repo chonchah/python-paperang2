@@ -29,6 +29,9 @@ def binimage2bitstream(bin_image: np.ndarray):
 def im2binimage(im, conversion="threshold"):
     # convert standard numpy array image to bin_image
     fixed_width = 384
+    print("shape", im.shape)
+    print("first three pixels:", im[:3,:3])
+
     if hasattr(config, "width"):
         fixed_width = config.width
     if (len(im.shape) > 3):
@@ -121,6 +124,7 @@ def im2binimage2(im):
     return binimage2bitstream(np_img)
 
 def load_and_convert_image(path):
+    # TODO: Add support for png images
     np_img = ski.io.imread(path)
     bw_image = im2binimage(np_img)
     return binimage2bitstream(bw_image)

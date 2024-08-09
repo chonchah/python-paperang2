@@ -31,12 +31,12 @@ def im2binimage(im, conversion="threshold"):
     fixed_width = 384
     print("shape", im.shape)
     print("first three pixels:", im[:3,:3])
-
+    channels = im.shape[2]
     if hasattr(config, "width"):
         fixed_width = config.width
-    if (len(im.shape) > 3):
+    if (channels > 3):
         im = ski.color.rgba2rgb(im)
-    if (len(im.shape) != 2):
+    if (channels > 2):
         im = ski.color.rgb2gray(im)
     im = ski.transform.resize(im, (round( fixed_width /im.shape[1]  * im.shape[0]), fixed_width))
     if conversion == "threshold":

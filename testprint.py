@@ -6,7 +6,6 @@ import image_data
 class Paperangg_Printer:
     def __init__(self):
         if hasattr(config, "macaddress"):
-            print("attempting test print to MAC address \"% s\""% config.macaddress)
             self.printer_hardware = hardware.Paperang(config.macaddress)
         else:
             print("searching for printer for test print...")

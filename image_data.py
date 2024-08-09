@@ -29,8 +29,6 @@ def binimage2bitstream(bin_image: np.ndarray):
 def im2binimage(im, conversion="threshold"):
     # convert standard numpy array image to bin_image
     fixed_width = 384
-    print("shape", im.shape)
-    print("first three pixels:", im[:3,:3])
     channels = im.shape[2]
     if hasattr(config, "width"):
         fixed_width = config.width

@@ -18,6 +18,7 @@ class Paperang:
     def __init__(self, address=None):
         self.address = address
         self.crckeyset = False
+        print("Trying to connect to printer with MAC address \"% s\""% self.address)
         self.connected = True if self.connect() else False
 
     def connect(self):
@@ -82,7 +83,6 @@ class Paperang:
             lambda s: 'protocol' in s and 'name' in s and s['protocol'] == 'RFCOMM' and (s['name'] == 'SerialPort' or s['name'] == 'Port'  or s['name'] == b'Port\x00'),
             service_matches
         ))
-        print(valid_service)
         if len(valid_service) == 0:
             logging.error("Cannot find valid services on device with MAC %s." % self.address)
             return False
@@ -95,9 +95,7 @@ class Paperang:
         # [{'host': b'A1:B2:C3:D4:E5:F6', 'port': 1, 'name': 'Port', 'description': None,
         #  'provider': None, 'protocol': None, 'service-classes': [], 'profiles': [], 'service-id': None}]
         service_matches = find_service(address=self.address)
-        # print("printing service matches...")
-        # print(service_matches)
-        # print("...done.")
+       
         valid_services = list(filter(
             lambda s: 'name' in s and s['name'] == 'SerialPort',
             service_matches
@@ -187,7 +185,7 @@ class Paperang:
         self.sendPaperTypeToBt()
         # msg = struct.pack("<%dc" % len(binary_img), *map(bytes, binary_img))
         msg = b"".join(map(lambda x: struct.pack("<c",x.to_bytes(1,byteorder="little")),binary_img))
-        # print(msg)
+     
         self.sendToBt(msg, BtCommandByte.PRT_PRINT_DATA, need_reply=False)
         self.sendFeedLineToBt(self.padding_line)
 

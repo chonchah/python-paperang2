@@ -13,7 +13,6 @@ import time
 class PaperangPrinter:
     def __init__(self):
         self.printer_hardware = hardware.Paperang(config.macaddress)
-        print("attempting test print to MAC address \"% s\""% config.macaddress)
     def print_image(self, path: str):
         if self.printer_hardware.connected:
             self.printer_hardware.sendImageToBt(image_data.load_and_convert_image(path))

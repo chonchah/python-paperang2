@@ -13,7 +13,6 @@ class Paperang_Printer:
             self.printer_hardware = hardware.Paperang()
 
     def print_self_test(self):
-        print("attempting test print to MAC address \"% s\""% config.macaddress)
         if self.printer_hardware.connected:
             self.printer_hardware.sendSelfTestToBt()
 

@@ -34,6 +34,7 @@ system_profiler SPBluetoothDataType
 ```
 
 ### Enable the HTTP Server API
+Now, you can start an http server for use the printer via POST API using HTTP protocol.
 Before, verify that the requirements and debian packages are installed (if you are running on debian distro).
 Install the requirements. Break this step if you have installed the requirements in above sections.
 ```sh

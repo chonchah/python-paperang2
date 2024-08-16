@@ -9,22 +9,24 @@
 </head>
 <body>
     <div id="app" class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">Camera Canvas App</h1>
-        <div class="mb-4">
-            <video ref="video" class="w-full max-w-md mx-auto" autoplay></video>
+        <div class="flex justify-center">
+            <label for="file"> Choose an image</label>
+            <input type="file" accept="image/*" @change="onInputFile">
         </div>
-        <div class="mb-4">
-            <button @click="capturePhoto" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Capture Photo
-            </button>
-        </div>
-        <div class="mb-4">
-            <canvas ref="canvas" class="w-full max-w-md mx-auto border border-gray-300"></canvas>
-        </div>
-        <div>
-            <button @click="sendToAPI" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Send to API
-            </button>
+        <div v-if="loading" class="m-5 bottom-0 left-0 absolute rounded-lg w-[400px] h-32  bg-[#008bb5] text-[#ffffff]">
+            <div class="flex flex-row w-full gap-5 justify-center items-center px-5 w-full h-full">
+                <div class="my-auto text-2xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="font-bold text-2xl">Check your Inbox!</div>
+                    <div class=" text-lg">You have one new unread message in your inbox.</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -33,29 +35,15 @@
 
         createApp({
             setup() {
-                const video = ref(null);
-                const canvas = ref(null);
-                let stream = null;
-
-                onMounted(async () => {
-                    try {
-                        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                        video.value.srcObject = stream;
-                    } catch (err) {
-                        console.error("Error accessing camera:", err);
+                onInputFile = (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        sendToAPI(file);
                     }
-                });
-
-                const capturePhoto = () => {
-                    const context = canvas.value.getContext('2d');
-                    canvas.value.width = video.value.videoWidth;
-                    canvas.value.height = video.value.videoHeight;
-                    context.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height);
                 };
-
-                const sendToAPI = async () => {
-                    // Convert canvas to blob
-                    const blob = await new Promise(resolve => canvas.value.toBlob(resolve, 'image/jpeg'));
+                const loading = ref(false);
+                const sendToAPI = async (blob) => {
+                    loading.value = true;
                     try {
                         const response = await fetch('/api/print', {
                             method: 'POST',
@@ -73,12 +61,12 @@
                         console.error("Error sending image to API:", err);
                         alert('Failed to send image to API');
                     }
+                    loading.value = false;
                 };
 
                 return {
-                    video,
-                    canvas,
-                    capturePhoto,
+                    loading,
+                    onInputFile,
                     sendToAPI,
                 };
             },

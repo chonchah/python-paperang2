@@ -12,6 +12,8 @@ import time
 class PaperangPrinter:
     def __init__(self):
         self.printer_hardware = hardware.Paperang(config.macaddress)
+    def disconnect(self):
+        return self.printer_hardware.disconnect()
     def print_image(self, path: str):
         if self.printer_hardware.connected:
             self.printer_hardware.sendImageToBt(image_data.load_and_convert_image(path))
@@ -19,11 +21,15 @@ class ImageStackThread(Thread):
     def __init__(self):
         super().__init__()
         self.printer_hardware = PaperangPrinter()
+        self.stop=False
         self.images_stack = []
     def append_image(self, image_path: str):
         self.images_stack.append(image_path)
+    def stopDaemon(self):
+        self.stop = True
     def run(self):
-        while True:
+        self.stop=False
+        while not self.stop:
             if len(self.images_stack) > 0:
                 image = self.images_stack.pop(0)
                 print("printing image %s" % image)
@@ -31,7 +37,18 @@ class ImageStackThread(Thread):
                 time.sleep(1)
 
 class PaperangPrinterHandler(tornado.web.RequestHandler):
-    
+
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "Content-Type")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
+    def options(self):
+        # no body
+        self.set_status(204)
+        self.finish()
+
+
     def post(self):
         try:
             # Get the Content-Type of the request
@@ -86,5 +103,6 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        ImageStack.stop()
+        print("Shutting down. Reason: keyboard interrupt")
+        ImageStack.stopDaemon()
         ImageStack.printer_hardware.disconnect()

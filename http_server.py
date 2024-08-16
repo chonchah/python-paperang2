@@ -47,7 +47,7 @@ class PaperangPrinterHandler(tornado.web.RequestHandler):
             self.write(f"Image uploaded to print successfully. Size: {len(image_data)} bytes")
             # Process the image (e.g., save it)
             salt = str(uuid4())
-            filename = "uploaded_image_%s.%s" %(salt, content_type.split("/")[0])
+            filename = "uploaded_image_%s" % (salt)
             filename = f"/tmp/{filename}"
             with open(filename, "wb") as f:
                 f.write(image_data)
@@ -57,7 +57,7 @@ class PaperangPrinterHandler(tornado.web.RequestHandler):
             # print traceback if something goes wrong
             import traceback
             traceback.print_exc()
-            self.printer_hardware.disconnect()
+            ImageStack.printer_hardware.disconnect()
             self.set_status(400)
             self.write(f"Error processing image: {str(e)}")
 

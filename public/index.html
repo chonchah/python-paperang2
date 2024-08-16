@@ -48,7 +48,7 @@
                         const response = await fetch('/api/print', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'image/jpeg',
+                                'Content-Type': 'application/octet-stream',
                             },
                             body: blob,
                         });

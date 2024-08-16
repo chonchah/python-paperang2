@@ -94,8 +94,8 @@ def make_app():
 
 async def main():
     app = make_app()
-    app.listen(8888)
-    print("Listening on port 8888")
+    app.listen(port=config.port, address=config.hostname)
+    print("Listening on port %d"%(config.port))
     ImageStack.start()
     await asyncio.Event().wait()
 

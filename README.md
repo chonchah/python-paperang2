@@ -33,6 +33,72 @@ If you need to look up your Paperang's MAC address quickly, you can use the `sys
 system_profiler SPBluetoothDataType
 ```
 
+### Enable the HTTP Server API
+Before, verify that the requirements and debian packages are installed (if you are running on debian distro).
+Install the requirements. Break this step if you have installed the requirements in above sections.
+```sh
+pip3 install -r requirements.txt
+```
+Copy and configure your config.py file and replace the variables `maccaddress, hostname, port` with your papreang printer's mac address, your hostname to bind (0.0.0.0 default) and your desired port (8888 default). If you don't know what is your maccaddress it's very easy to get: put paper in the printer, press the power button one time for 3 sec. for turn on the printer, after the green led is on make a double-press to the power button, then the printer will print a QR code. Scan the QR and you'll get an URL address. Check the last parameter named `deviceId=macaddress` and get your macaddress.
+```sh
+cp config.example.py config.py
+nano config.py
+```
+Finally, The file looks like that:
+```python
+#!/usr/bin/env python3
+macaddress = "FF:FF:FF:FF:FF:FF" # REPLACE WITH YOUR MACADDRESS
+width = 384
+hostname = "0.0.0.0"
+port = 8888
+```
+Run the server:
+```sh
+python3 http_server.py
+```
+The script will output the next if everything it`s right:
+```sh
+Trying to connect to printer with MAC address "FF:FF:FF:FF:FF:FF"
+Serving static files from /home/username/python-paperang2/public
+Listening on port 8888
+```
+Now it's alive. You can open your browser and navigate to http://localhost:8888/ and select a image file to send to printer API.
+**Here is the CURL command for make your requests. The API accpets .png and .jpg files.**
+
+```sh
+curl 'http://localhost:8888/api/print' \
+  -H 'Content-Type: application/octet-stream' \
+  --data-binary "@/path/to/your/image.jpg"
+```
+And the javascript function to send Image to print:
+```js
+/**
+ * Send a image file to the API
+ *
+ * @param {File} file - The image file to send.
+ */
+function sendToAPI(file){
+    fetch('http://localhost:8888/api/print', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/octet-stream',
+        },
+        body: file,
+    }).then( response => {
+        console.log("Send image to printer:",response.statusText)
+    })
+    .catch( err=> { console.log(err) } )
+}
+```
+Ussage:
+```js
+const onInputFile = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        sendToAPI(file);
+    }
+};
+```
 #### Print Little Printer data
 
 
